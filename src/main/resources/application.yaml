@@ -1,3 +1,30 @@
 spring:
+  profiles:
+    default: local
   application:
     name: booklibrarysystem
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

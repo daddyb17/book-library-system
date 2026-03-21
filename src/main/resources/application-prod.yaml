@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/booklibrarysystem}
+    username: ${DB_USERNAME:booklibrarysystem}
+    password: ${DB_PASSWORD:booklibrarysystem}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
