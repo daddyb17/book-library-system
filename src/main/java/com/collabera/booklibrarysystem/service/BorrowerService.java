@@ -8,20 +8,17 @@ import com.collabera.booklibrarysystem.repository.BorrowerRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BorrowerService {
 
     private final BorrowerRepository borrowerRepository;
     private final Clock clock;
-
-    public BorrowerService(BorrowerRepository borrowerRepository, Clock clock) {
-        this.borrowerRepository = borrowerRepository;
-        this.clock = clock;
-    }
 
     @Transactional
     public Borrower registerBorrower(CreateBorrowerRequest request) {

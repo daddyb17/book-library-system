@@ -2,6 +2,7 @@ package com.collabera.booklibrarysystem.service;
 
 import com.collabera.booklibrarysystem.dto.BookResponse;
 import com.collabera.booklibrarysystem.dto.CreateBookRequest;
+import com.collabera.booklibrarysystem.exception.BadRequestException;
 import com.collabera.booklibrarysystem.dto.PageResponse;
 import com.collabera.booklibrarysystem.exception.BusinessConflictException;
 import com.collabera.booklibrarysystem.exception.ResourceNotFoundException;
@@ -12,12 +13,14 @@ import com.collabera.booklibrarysystem.repository.BookRepository;
 import com.collabera.booklibrarysystem.repository.LoanRepository;
 import com.collabera.booklibrarysystem.util.ResponseMapper;
 import com.collabera.booklibrarysystem.util.SortParser;
+import com.collabera.booklibrarysystem.validation.IsbnSupport;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookService {
 
@@ -42,23 +46,11 @@ public class BookService {
     private final LoanRepository loanRepository;
     private final Clock clock;
 
-    public BookService(
-        BookCatalogEntryRepository bookCatalogEntryRepository,
-        BookRepository bookRepository,
-        LoanRepository loanRepository,
-        Clock clock
-    ) {
-        this.bookCatalogEntryRepository = bookCatalogEntryRepository;
-        this.bookRepository = bookRepository;
-        this.loanRepository = loanRepository;
-        this.clock = clock;
-    }
-
     @Transactional
     public Book registerBook(CreateBookRequest request) {
-        String isbn = normalize(request.isbn());
-        String title = normalize(request.title());
-        String author = normalize(request.author());
+        String isbn = normalizeIsbn(request.isbn());
+        String title = normalizeText(request.title());
+        String author = normalizeText(request.author());
 
         BookCatalogEntry catalogEntry = resolveCatalogEntry(isbn, title, author);
         Book book = new Book(catalogEntry, Instant.now(clock));
@@ -81,8 +73,16 @@ public class BookService {
             .orElseThrow(() -> new ResourceNotFoundException("Book not found for id %d".formatted(bookId)));
     }
 
-    private String normalize(String value) {
+    private String normalizeText(String value) {
         return value.trim();
+    }
+
+    private String normalizeIsbn(String rawIsbn) {
+        String canonicalIsbn = IsbnSupport.canonicalize(rawIsbn);
+        if (!IsbnSupport.isValid(canonicalIsbn)) {
+            throw new BadRequestException("ISBN must be a valid ISBN-10 or ISBN-13.");
+        }
+        return canonicalIsbn;
     }
 
     private BookCatalogEntry resolveCatalogEntry(String isbn, String title, String author) {

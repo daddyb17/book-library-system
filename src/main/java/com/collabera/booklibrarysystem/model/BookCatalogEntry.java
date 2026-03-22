@@ -9,8 +9,13 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
     name = "book_catalog_entries",
     uniqueConstraints = @UniqueConstraint(name = "uk_book_catalog_entries_isbn", columnNames = "isbn")
@@ -37,9 +42,6 @@ public class BookCatalogEntry {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected BookCatalogEntry() {
-    }
-
     public BookCatalogEntry(String isbn, String title, String author, Instant createdAt) {
         this.isbn = isbn;
         this.title = title;
@@ -49,29 +51,5 @@ public class BookCatalogEntry {
 
     public boolean matchesCatalogDetails(String candidateTitle, String candidateAuthor) {
         return title.equalsIgnoreCase(candidateTitle) && author.equalsIgnoreCase(candidateAuthor);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public Long getRowVersion() {
-        return rowVersion;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 }

@@ -36,10 +36,16 @@ create table loans (
     book_id bigint not null,
     borrowed_at timestamp with time zone not null,
     returned_at timestamp with time zone,
+    active_loan_book_id bigint,
     row_version bigint not null default 0,
+    constraint chk_loans_active_loan_book_id check (
+        (returned_at is null and active_loan_book_id = book_id)
+        or (returned_at is not null and active_loan_book_id is null)
+    ),
     constraint fk_loans_borrower foreign key (borrower_id) references borrowers (id),
     constraint fk_loans_book foreign key (book_id) references books (id)
 );
 
 create index idx_loans_book_active on loans (book_id, returned_at);
 create index idx_loans_borrower_active on loans (borrower_id, returned_at);
+create unique index uk_loans_active_loan_book_id on loans (active_loan_book_id);

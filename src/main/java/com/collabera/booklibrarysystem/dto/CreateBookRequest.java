@@ -3,11 +3,13 @@ package com.collabera.booklibrarysystem.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.collabera.booklibrarysystem.validation.ValidIsbn;
 
 @Schema(description = "Payload used to register a book copy.")
 public record CreateBookRequest(
     @Schema(example = "9780132350884")
     @NotBlank(message = "ISBN is required.")
+    @ValidIsbn
     @Size(max = 20, message = "ISBN must be at most 20 characters.")
     String isbn,
 

@@ -11,8 +11,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "books")
 public class Book {
 
@@ -31,16 +36,9 @@ public class Book {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected Book() {
-    }
-
     public Book(BookCatalogEntry catalogEntry, Instant createdAt) {
         this.catalogEntry = catalogEntry;
         this.createdAt = createdAt;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getIsbn() {
@@ -53,17 +51,5 @@ public class Book {
 
     public String getAuthor() {
         return catalogEntry.getAuthor();
-    }
-
-    public BookCatalogEntry getCatalogEntry() {
-        return catalogEntry;
-    }
-
-    public Long getRowVersion() {
-        return rowVersion;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 }

@@ -30,3 +30,21 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t booklibrarysystem:ci .
+
+      - name: Start container for smoke test
+        run: docker run -d --name booklibrarysystem-smoke -e SPRING_PROFILES_ACTIVE=local -p 8080:8080 booklibrarysystem:ci
+
+      - name: Verify health endpoint
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8080/actuator/health; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs booklibrarysystem-smoke
+          exit 1
+
+      - name: Stop smoke test container
+        if: always()
+        run: docker rm -f booklibrarysystem-smoke

@@ -3,9 +3,11 @@ package com.collabera.booklibrarysystem.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.collabera.booklibrarysystem.dto.CreateBookRequest;
+import com.collabera.booklibrarysystem.exception.BadRequestException;
 import com.collabera.booklibrarysystem.exception.BusinessConflictException;
 import com.collabera.booklibrarysystem.model.Book;
 import com.collabera.booklibrarysystem.model.BookCatalogEntry;
@@ -62,9 +64,10 @@ class BookServiceTest {
         when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Book savedBook = bookService.registerBook(
-            new CreateBookRequest("9780132350884", "clean code", "robert c. martin")
+            new CreateBookRequest("978-0-13-235088-4", "clean code", "robert c. martin")
         );
 
+        assertThat(savedBook.getIsbn()).isEqualTo("9780132350884");
         assertThat(savedBook.getTitle()).isEqualTo("Clean Code");
         assertThat(savedBook.getAuthor()).isEqualTo("Robert C. Martin");
         assertThat(savedBook.getCreatedAt()).isEqualTo(Instant.parse("2026-03-21T10:15:30Z"));
@@ -102,5 +105,16 @@ class BookServiceTest {
         ))
             .isInstanceOf(BusinessConflictException.class)
             .hasMessageContaining("9780132350884");
+    }
+
+    @Test
+    void registerBookRejectsInvalidIsbn() {
+        assertThatThrownBy(() -> bookService.registerBook(
+            new CreateBookRequest("not-an-isbn", "Clean Code", "Robert C. Martin")
+        ))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessage("ISBN must be a valid ISBN-10 or ISBN-13.");
+
+        verifyNoInteractions(bookCatalogEntryRepository, bookRepository);
     }
 }

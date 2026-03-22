@@ -8,8 +8,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "borrowers")
 public class Borrower {
 
@@ -30,32 +35,9 @@ public class Borrower {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected Borrower() {
-    }
-
     public Borrower(String name, String email, Instant createdAt) {
         this.name = name;
         this.email = email;
         this.createdAt = createdAt;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Long getRowVersion() {
-        return rowVersion;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 }

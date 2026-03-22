@@ -11,8 +11,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "loans")
 public class Loan {
 
@@ -34,48 +39,26 @@ public class Loan {
     @Column(name = "returned_at")
     private Instant returnedAt;
 
+    @Column(name = "active_loan_book_id")
+    private Long activeLoanBookId;
+
     @Version
     @Column(name = "row_version", nullable = false)
     private Long rowVersion;
-
-    protected Loan() {
-    }
 
     public Loan(Borrower borrower, Book book, Instant borrowedAt) {
         this.borrower = borrower;
         this.book = book;
         this.borrowedAt = borrowedAt;
+        this.activeLoanBookId = book.getId();
     }
 
     public void markReturned(Instant returnedAt) {
         this.returnedAt = returnedAt;
+        this.activeLoanBookId = null;
     }
 
     public boolean isActive() {
         return returnedAt == null;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Borrower getBorrower() {
-        return borrower;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public Instant getBorrowedAt() {
-        return borrowedAt;
-    }
-
-    public Instant getReturnedAt() {
-        return returnedAt;
-    }
-
-    public Long getRowVersion() {
-        return rowVersion;
     }
 }

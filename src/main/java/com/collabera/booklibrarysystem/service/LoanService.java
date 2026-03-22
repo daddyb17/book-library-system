@@ -10,10 +10,12 @@ import com.collabera.booklibrarysystem.repository.LoanRepository;
 import com.collabera.booklibrarysystem.util.ResponseMapper;
 import java.time.Clock;
 import java.time.Instant;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LoanService {
 
@@ -21,18 +23,6 @@ public class LoanService {
     private final BookService bookService;
     private final LoanRepository loanRepository;
     private final Clock clock;
-
-    public LoanService(
-        BorrowerService borrowerService,
-        BookService bookService,
-        LoanRepository loanRepository,
-        Clock clock
-    ) {
-        this.borrowerService = borrowerService;
-        this.bookService = bookService;
-        this.loanRepository = loanRepository;
-        this.clock = clock;
-    }
 
     @Transactional
     public LoanResponse borrowBook(Long borrowerId, Long bookId) {
